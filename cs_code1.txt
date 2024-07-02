@@ -1,0 +1,168 @@
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
+using System.Web;
+using System.Web.Services;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+
+namespace Ma_AppSuite.Asirvad_Internal
+{
+    public partial class Crud_Operation_Interview : System.Web.UI.Page
+    {
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            string usr, bid, fimid;
+            if (string.IsNullOrEmpty(Session["username"] as string))
+            {
+                Response.Redirect("SessionExpired.aspx");
+            }
+            else
+            {
+                usr = Session["username"].ToString();
+                bid = Session["branch_id"].ToString();
+                fimid = Session["firm_id"].ToString();
+                this.hdUserId1.Value = usr;
+                this.hdBrid.Value = bid;
+                this.hdFirmId.Value = fimid;
+                //hdPag.Value = Request.QueryString["pag"];
+            }
+        }
+        [WebMethod(EnableSession = true)]
+        public static string submit(string QueryString, string Input)
+        {
+            DataSet ds = new DataSet();
+            string str = "";
+            ServiceReference1.ServiceClient obj = new ServiceReference1.ServiceClient();
+            ds = obj.GetDetails("PROC_CRUD_OPERATION_INTERVIEW", "CRUD", QueryString, Input, "", "");
+            try
+            {
+                if (ds.Tables[0].Rows.Count > 0)
+                {
+                    str = ds.Tables[0].Rows[0][0].ToString();
+                }
+            }
+            catch (Exception e)
+            {
+
+            }
+            return str;
+        }
+        public class getreqtype1
+        {
+            public string Emp_Code { get; set; }
+        }
+
+        [WebMethod(EnableSession = true)]
+        public static List<getreqtype1> dropdown(string QueryString)
+        {
+            ServiceReference1.ServiceClient obj = new ServiceReference1.ServiceClient();
+            List<getreqtype1> gtreq = new List<getreqtype1>();
+            DataSet ds = new DataSet();
+            ds = obj.GetDetails("PROC_CRUD_OPERATION_INTERVIEW", "CRUD", QueryString, "", "", "");
+            try
+            {
+                if (ds.Tables.Count > 0)
+                {
+                    if (ds.Tables[0].Rows.Count > 0)
+                    {
+                        foreach (DataRow dr in ds.Tables[0].Rows)
+                        {
+                            gtreq.Add(new getreqtype1()
+                            {
+                                Emp_Code = dr[0].ToString()
+                            });
+
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return gtreq;
+        }
+        [WebMethod(EnableSession = true)]
+        public static string valappend(string QueryString, string input)
+        {
+            DataSet ds = new DataSet();
+            string str = "";
+            ServiceReference1.ServiceClient obj = new ServiceReference1.ServiceClient();
+            ds = obj.GetDetails("PROC_CRUD_OPERATION_INTERVIEW", "CRUD", QueryString, input, "", "");
+            try
+            {
+                if (ds.Tables[0].Rows.Count > 0)
+                {
+                    str = ds.Tables[0].Rows[0][0].ToString() + "^" +
+                        Convert.ToString(ds.Tables[0].Rows[0][1]) + "^" +
+                        Convert.ToString(ds.Tables[0].Rows[0][2]) + "^" +
+                        Convert.ToString(ds.Tables[0].Rows[0][3]) + "^" +
+                        Convert.ToString(ds.Tables[0].Rows[0][4]) + "^" +
+                        Convert.ToString(ds.Tables[0].Rows[0][5]) + "^" +
+                        Convert.ToString(ds.Tables[0].Rows[0][6]) + "^" +
+                        Convert.ToString(ds.Tables[0].Rows[0][7]) + "^" +
+                        Convert.ToString(ds.Tables[0].Rows[0][8]);
+                }
+            }
+            catch (Exception e)
+            {
+            }
+            return str;
+        }
+        public class ReportTabl
+        {
+            public string EMP_CODE { get; set; }
+            public string EMP_NAME { get; set; }
+            public string ADDRESS { get; set; }
+            public string PLACE { get; set; }
+            public string GENDER { get; set; }
+            public string DOB { get; set; }
+            public string PHONE { get; set; }
+            public string EDUCATION { get; set; }
+            public string DESIGNATION { get; set; }
+            public string ENTERED_DATE { get; set; }
+        }
+
+        [WebMethod(EnableSession = true)]
+        public static List<ReportTabl> alldetails(string Querystring)
+        {
+            ServiceReference1.ServiceClient obj = new ServiceReference1.ServiceClient();
+            List<ReportTabl> report = new List<ReportTabl>();
+            DataSet ds = new DataSet();
+            ds = obj.GetDetails("PROC_CRUD_OPERATION_INTERVIEW", "CRUD", Querystring, "", "", "");
+            try
+            {
+                if (ds.Tables.Count > 0)
+                {
+                    if (ds.Tables[0].Rows.Count > 0)
+                    {
+                        foreach (DataRow dr in ds.Tables[0].Rows)
+                        {
+                            report.Add(new ReportTabl()
+                            {
+                                EMP_CODE = dr[0].ToString(),
+                                EMP_NAME = dr[1].ToString(),
+                                ADDRESS = dr[2].ToString(),
+                                PLACE = dr[3].ToString(),
+                                GENDER = dr[4].ToString(),
+                                DOB = dr[5].ToString(),
+                                PHONE = dr[6].ToString(),
+                                EDUCATION = dr[7].ToString(),
+                                DESIGNATION = dr[8].ToString(),
+                                ENTERED_DATE = dr[9].ToString(),
+                            });
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return report;
+        }
+
+    }
+}

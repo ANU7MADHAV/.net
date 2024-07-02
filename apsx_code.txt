@@ -1,0 +1,801 @@
+<%@ Page Title="" Language="C#" MasterPageFile="~/Main.Master" AutoEventWireup="true" CodeBehind="Crud_Operation_Interview.aspx.cs" Inherits="Ma_AppSuite.Asirvad_Internal.Crud_Operation_Interview" %>
+<asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
+    <script>
+        $(window).load(function () {
+            $('#Head_div1').hide();
+            $('#Head_div2').hide();
+            $('#Head_div3').hide();
+            $('#Head_div4').hide();
+            $('#button_div').hide();
+            $('#button_div_1').hide();
+            $('#button_div_2').hide();
+            $('#row_div1').hide();
+            $('#row_div2').hide();
+            $('#tbl_div').hide();
+            $("#dob").datepicker({
+                dateFormat: 'dd/MM/yy',
+                maxDate: new Date(),
+                yearRange: 'c-100:c',
+                todayHighlight: true
+            });
+        });
+        function FetchData() {
+            if ($('#option').val() == 0) {
+                alert("Please Select an Option");
+                $('#option').focus();
+            }
+            else {
+                if ($('#option').val() == 1) {
+                    $('#Head_div1').show();
+                    $('#Head_div').hide();
+                    $('#row_div').hide();
+                    $('#tbl_div').show();
+                    all_emp_details();
+                }
+                else if ($('#option').val() == 2) {
+                    $('#Head_div2').show();
+                    $('#Head_div').hide();
+                    $('#row_div').hide();
+                    $('#row_div1').show();
+                    $('#button_div').show();
+                }
+                else if ($('#option').val() == 3) {
+                    $('#Head_div3').show();
+                    $('#Head_div').hide();
+                    $('#row_div').hide();
+                    $('#row_div2').show();
+                    $('#button_div_1').show();
+                    var flag = "drop_empcodes";
+                    $.ajax({
+                        type: "POST",
+                        contentType: "application/json; charset=utf-8",
+                        url: "Crud_Operation_Interview.aspx/dropdown",
+                        data: "{QueryString:'" + flag + "'}",
+                        dataType: "json",
+                        success: function (Result) {
+                            $('#emp_code').empty();
+                            $('#emp_code').append($("<option></option>").val("0").html("Select"));
+                            $.each(Result.d, function (data, value) {
+                                $('#emp_code').append($("<option></option>").val(value.Emp_Code).html(value.Emp_Code));
+                            })
+                            $('#emp_code').change(function () {
+                                if ($("#emp_code option:selected").val() == 0) {
+                                    alert("Please Select A Employee Code.");
+                                    $('#emp_code').focus();
+                                }
+                                else {
+                                    value_append();
+                                }
+                            });
+                        },
+                        error: function (Result) {
+                            alert(Result.d);
+                        }
+                    });
+                }
+                else if ($('#option').val() == 4) {
+                    $('#Head_div4').show();
+                    $('#Head_div').hide();
+                    $('#row_div').hide();
+                    $('#row_div2').show();
+                    $('#button_div_2').show();
+                    var flag = "drop_empcodes";
+                    $.ajax({
+                        type: "POST",
+                        contentType: "application/json; charset=utf-8",
+                        url: "Crud_Operation_Interview.aspx/dropdown",
+                        data: "{QueryString:'" + flag + "'}",
+                        dataType: "json",
+                        success: function (Result) {
+                            $('#emp_code').empty();
+                            $('#emp_code').append($("<option></option>").val("0").html("Select"));
+                            $.each(Result.d, function (data, value) {
+                                $('#emp_code').append($("<option></option>").val(value.Emp_Code).html(value.Emp_Code));
+                            })
+                            $('#emp_code').change(function () {
+                                if ($("#emp_code option:selected").val() == 0) {
+                                    alert("Please Select A Employee Code.");
+                                    $('#emp_code').focus();
+                                }
+                                else {
+                                    value_append_del();
+                                }
+                            });
+                        },
+                        error: function (Result) {
+                            alert(Result.d);
+                        }
+                    });
+                }
+            }
+        }
+        function all_emp_details() {
+            var flag = "all_emp_details";
+            $.ajax({
+                type: "POST",
+                contentType: "application/json; charset=utf-8",
+                url: "Crud_Operation_Interview.aspx/alldetails",
+                data: "{ Querystring:'" + flag + "'}",
+                dataType: "json",
+                success: function (Result) {
+                    if (Result.d.length > 0) {
+                        $('#tblticket').empty();
+                        $('#tblticket').append('<thead class="thead color" ><tr><td scope="col"  class="col-md ">SL.NO</td><td scope="col" >EMP CODE</td><td scope="col">EMP NAME</td><td scope="col">ADDRESS</td><td scope="col">PLACE</td><td scope="col">GENDER</td><td scope="col">DATE OF BIRTH</td><td scope="col">CONTACT NUMBER</td><td scope="col">QUALIFICATION</td><td scope="col">DESIGNATION </td><td scope="col">ENTERED DATE</td></tr></thead><tbody>');
+                        for (var i = 0; i < Result.d.length; i++) {
+                            k = i + 1;
+                            $('#tblticket').append('<tr style="cursor:pointer;"><td style="font-size:13px;color:black;text-align:center;">' + k + '</td>' +
+                                '<td style="font-size:13px;color:black;text-align:center;">' + Result.d[i].EMP_CODE + '</td>' +
+                                '<td style="font-size:13px;color:black;text-align:center;">' + Result.d[i].EMP_NAME + '</td>' +
+                                '<td style="font-size:13px;color:black;text-align:center;">' + Result.d[i].ADDRESS + '</td>' +
+                                '<td style="font-size:13px;color:black;text-align:center;">' + Result.d[i].PLACE + '</td>' +
+                                '<td style="font-size:13px;color:black;text-align:center;">' + Result.d[i].GENDER + '</td>' +
+                                '<td style="font-size:13px;color:black;text-align:center;">' + Result.d[i].DOB + '</td>' +
+                                '<td style="font-size:13px;color:black;text-align:center;">' + Result.d[i].PHONE + '</td>' +
+                                '<td style="font-size:13px;color:black;text-align:center;">' + Result.d[i].EDUCATION + '</td>' +
+                                '<td style="font-size:13px;color:black;text-align:center;">' + Result.d[i].DESIGNATION + '</td>' +
+                                '<td style="font-size:13px;color:black;text-align:center;">' + Result.d[i].ENTERED_DATE + '</td>'
+                                + '</tr>');
+                        }
+                        $('#tblticket').append(
+                            '</tbody>');
+                        $('#table').show();
+                        return;
+                    } else {
+                        alert('No Data Found');
+                        window.open("Crud_Operation_Interview.aspx", "_self");
+                    }
+                },
+                error: function (Result) {
+                    alert(Result.d);
+                }
+            });
+        }
+        function value_append_del() {
+            var flag = 'select';
+            var input = $('#emp_code').val();
+            $.ajax({
+                type: "POST",
+                contentType: "application/json; charset=utf-8",
+                url: "Crud_Operation_Interview.aspx/valappend",
+                data: "{QueryString:'" + flag + "',input : '" + input + "'}",
+                dataType: "json",
+                success: function (Result) {
+                    var res = Result.d.split("^");
+                    $('#date').val(res[0]);
+                    $('#name_edit').val(res[1]);
+                    $('#address_edit').val(res[2]);
+                    $('#place_edit').val(res[3]);
+                    var dropdown = document.getElementById("gender_edit");
+                    var gender = res[4];
+                    for (var i = 0; i < dropdown.options.length; i++) {
+                        if (dropdown.options[i].value === gender) {
+                            dropdown.options[i].selected = true;
+                            break;
+                        }
+                    }
+                    $('#dob_edit').val(res[5]);
+                    $('#phone_edit').val(res[6]);
+                    var dropdown1 = document.getElementById("education_edit");
+                    var education = res[7];
+                    for (var i = 0; i < dropdown1.options.length; i++) {
+                        if (dropdown1.options[i].value === education) {
+                            dropdown1.options[i].selected = true;
+                            break;
+                        }
+                    }
+                    var dropdown2 = document.getElementById("designation_edit");
+                    var designation = res[8];
+                    for (var i = 0; i < dropdown2.options.length; i++) {
+                        if (dropdown2.options[i].value === designation) {
+                            dropdown2.options[i].selected = true;
+                            break;
+                        }
+                    }
+                },
+                error: function (Result) {
+                    alert(Result.d);
+                }
+            });
+        }
+        function value_append() {
+            var flag = 'select';
+            var input = $('#emp_code').val();
+            $.ajax({
+                type: "POST",
+                contentType: "application/json; charset=utf-8",
+                url: "Crud_Operation_Interview.aspx/valappend",
+                data: "{QueryString:'" + flag + "',input : '" + input + "'}",
+                dataType: "json",
+                success: function (Result) {
+                    var res = Result.d.split("^");
+                    $('#date').val(res[0]);
+                    $('#name_edit').val(res[1]);
+                    document.getElementById("name_edit").disabled = false;
+                    $('#address_edit').val(res[2]);
+                    document.getElementById("address_edit").disabled = false;
+                    $('#place_edit').val(res[3]);
+                    document.getElementById("place_edit").disabled = false;
+                    var dropdown = document.getElementById("gender_edit");
+                    var gender = res[4];
+                    for (var i = 0; i < dropdown.options.length; i++) {
+                        if (dropdown.options[i].value === gender) {
+                            dropdown.options[i].selected = true;
+                            break;
+                        }
+                    }          
+                    document.getElementById("gender_edit").disabled = false;
+                    $('#dob_edit').val(res[5]);
+                    $("#dob_edit").datepicker({
+                        dateFormat: 'dd/MM/yy',
+                        maxDate: new Date(),
+                        yearRange: 'c-100:c',
+                        todayHighlight: true
+                    });
+                    document.getElementById("dob_edit").disabled = false;
+                    $('#phone_edit').val(res[6]);
+                    document.getElementById("phone_edit").disabled = false;
+                    var dropdown1 = document.getElementById("education_edit");
+                    var education = res[7];
+                    for (var i = 0; i < dropdown1.options.length; i++) {
+                        if (dropdown1.options[i].value === education) {
+                            dropdown1.options[i].selected = true;
+                            break;
+                        }
+                    }
+                    document.getElementById("education_edit").disabled = false;
+                    var dropdown2 = document.getElementById("designation_edit");
+                    var designation = res[8];
+                    for (var i = 0; i < dropdown2.options.length; i++) {
+                        if (dropdown2.options[i].value === designation) {
+                            dropdown2.options[i].selected = true;
+                            break;
+                        }
+                    }
+                    document.getElementById("designation_edit").disabled = false;
+                },
+                error: function (Result) {
+                    alert(Result.d);
+                }
+            });
+        }
+        function check_num() {
+            var mobileNumber1 = $('#phone_edit').val();
+            if (isValidMobileNum(mobileNumber1)) {
+            } else {
+                alert("Enter Valid Mobile Number");
+                $('#phone_edit').val('');
+                $('#phone_edit').focus();
+            }
+        }
+
+        function isValidMobileNum() {
+            var mobileNumber = $('#phone_edit').val();
+
+            // Define a regular expression for 10-digit mobile numbers
+            var mobileNumberPattern = /^\d{10}$/;
+
+            // Test the input against the regular expression
+            return mobileNumberPattern.test(mobileNumber);
+        }
+        function check_number() {
+            var mobileNumber1 = $('#phone').val();
+            if (isValidMobileNumber(mobileNumber1)) {
+            } else {
+                alert("Enter Valid Mobile Number");
+                $('#phone').val('');
+                $('#phone').focus();
+            }
+        }
+
+        function isValidMobileNumber() {
+            var mobileNumber = $('#phone').val();
+
+            // Define a regular expression for 10-digit mobile numbers
+            var mobileNumberPattern = /^\d{10}$/;
+
+            // Test the input against the regular expression
+            return mobileNumberPattern.test(mobileNumber);
+        }
+        function validate(evt) {
+            var theEvent = evt || window.event;
+            // Handle paste
+            if (theEvent.type === 'paste') {
+                key = event.clipboardData.getData('text/plain');
+            } else {
+                // Handle key press
+                var key = theEvent.keyCode || theEvent.which;
+                key = String.fromCharCode(key);
+            }
+            var regex = /[0-9]|\./;
+            if (!regex.test(key)) {
+                theEvent.returnValue = false;
+                if (theEvent.preventDefault) theEvent.preventDefault();
+            }
+            event.target.value = event.target.value.replace(/[^0-9]*/g, '');
+            if (event.key === '.') { event.preventDefault(); }
+        }
+        function Back() {
+            window.location = "Crud_Operation_Interview.aspx";
+        }
+        function Submit() {
+            var num = $('#phone').val();
+            if (document.getElementById("name").value.trim() == "") {
+                alert("Please Enter Employee Name");
+                $('#name').focus();
+                return false;
+            }
+            else if (document.getElementById("address").value.trim() == "") {
+                alert("Please Enter Address");
+                $('#address').focus();
+                return false;
+            }
+            else if (document.getElementById("place").value.trim() == "") {
+                alert("Please Enter Place");
+                $('#place').focus();
+                return false;
+            }
+            else if ($("#gender option:selected").val() == 0) {
+                alert("Please Select Any Gender");
+                $('#gender').focus();
+                return false;
+            }
+            else if (document.getElementById("dob").value.trim() == "") {
+                alert("Please Enter Date Of Birth");
+                $('#dob').focus();
+                return false;
+            }
+            else if (document.getElementById("phone").value.trim() == "") {
+                alert("Please Enter Contact Number");
+                $('#phone').focus();
+                return false;
+            }
+            else if (num.charAt(0) == '0') {
+                alert("Please Enter Valid Mobile Number");
+                $('#phone').val("");
+                $('#phone').focus();
+                return false;
+            }
+            else if ($("#education option:selected").val() == 0) {
+                alert("Please Select Qualification");
+                $('#education').focus();
+                return false;
+            }
+            else if ($("#designation option:selected").val() == 0) {
+                alert("Please Select Department");
+                $('#designation').focus();
+                return false;
+            }
+            else {
+                document.getElementById("submit").disabled = true;
+                var flag = 'insert';
+                var name = $('#name').val();
+                var address = $('#address').val();
+                var place = $('#place').val();
+                var gen = document.getElementById("gender");
+                var gend = gen.options[gen.selectedIndex].text;
+                var gender = gend;
+                var dob = $('#dob').val();
+                var phone = $('#phone').val();
+                var edu = document.getElementById("education");
+                var educa = edu.options[edu.selectedIndex].text;
+                var education = educa;
+                var des = document.getElementById("designation");
+                var desig = des.options[des.selectedIndex].text;
+                var designation = desig;
+                var inputs = name + '¥' + address + '¥' + place + '¥' + gender + '¥' + dob + '¥' + phone + '¥' + education + '¥' + designation;
+                $.ajax({
+                    type: "POST",
+                    contentType: "application/json; charset=utf-8",
+                    url: "Crud_Operation_Interview.aspx/submit",
+                    data: "{QueryString:'" + flag + "',Input : '" + inputs + "'}",
+                    dataType: "json",
+                    success: function (Result) {
+                        alert(Result.d);
+                        window.open('Crud_Operation_Interview.aspx', '_self');
+                    },
+                    error: function (Result) {
+                        alert(Result.d);
+                        document.getElementById("submit").disabled = false;
+                    }
+                });
+            }         
+        }
+        function Update() {
+            var num = $('#phone_edit').val();
+            if ($("#emp_code option:selected").val() == 0) {
+                alert("Please Select  Employee Code");
+                $('#emp_code').focus();
+                return false;
+            }
+            else if (document.getElementById("name_edit").value.trim() == "") {
+                alert("Please Enter Employee Name");
+                $('#name_edit').focus();
+                return false;
+            }
+            else if (document.getElementById("address_edit").value.trim() == "") {
+                alert("Please Enter Address");
+                $('#address_edit').focus();
+                return false;
+            }
+            else if (document.getElementById("place_edit").value.trim() == "") {
+                alert("Please Enter Place");
+                $('#place_edit').focus();
+                return false;
+            }
+            else if ($("#gender_edit option:selected").val() == 0) {
+                alert("Please Select Any Gender");
+                $('#gender_edit').focus();
+                return false;
+            }
+            else if (document.getElementById("dob_edit").value.trim() == "") {
+                alert("Please Enter Date Of Birth");
+                $('#dob_edit').focus();
+                return false;
+            }
+            else if (document.getElementById("phone_edit").value.trim() == "") {
+                alert("Please Enter Contact Number");
+                $('#phone_edit').focus();
+                return false;
+            }
+            else if (num.charAt(0) == '0') {
+                alert("Please Enter Valid Mobile Number");
+                $('#phone_edit').val("");
+                $('#phone_edit').focus();
+                return false;
+            }
+            else if ($("#education_edit option:selected").val() == 0) {
+                alert("Please Select Qualification");
+                $('#education_edit').focus();
+                return false;
+            }
+            else if ($("#designation_edit option:selected").val() == 0) {
+                alert("Please Select Department");
+                $('#designation_edit').focus();
+                return false;
+            }
+            else {
+                document.getElementById("update").disabled = true;
+                var flag = 'update';
+                var name = $('#name_edit').val();
+                var address = $('#address_edit').val();
+                var place = $('#place_edit').val();
+                var gen = document.getElementById("gender_edit");
+                var gend = gen.options[gen.selectedIndex].text;
+                var gender = gend;
+                var dob = $('#dob_edit').val();
+                var phone = $('#phone_edit').val();
+                var edu = document.getElementById("education_edit");
+                var educa = edu.options[edu.selectedIndex].text;
+                var education = educa;
+                var des = document.getElementById("designation_edit");
+                var desig = des.options[des.selectedIndex].text;
+                var designation = desig;
+                var emp_code = $('#emp_code').val();
+                var inputs = name + '¥' + address + '¥' + place + '¥' + gender + '¥' + dob + '¥' + phone + '¥' + education + '¥' + designation + '¥' + emp_code;
+                $.ajax({
+                    type: "POST",
+                    contentType: "application/json; charset=utf-8",
+                    url: "Crud_Operation_Interview.aspx/submit",
+                    data: "{QueryString:'" + flag + "',Input : '" + inputs + "'}",
+                    dataType: "json",
+                    success: function (Result) {
+                        alert(Result.d);
+                        window.open('Crud_Operation_Interview.aspx', '_self');
+                    },
+                    error: function (Result) {
+                        alert(Result.d);
+                        document.getElementById("update").disabled = false;
+                    }
+                });
+            }
+        }
+        function Delete() {
+            if ($("#emp_code option:selected").val() == 0) {
+                alert("Please Select  Employee Code");
+                $('#emp_code').focus();
+                return false;
+            }
+            else {
+                document.getElementById("delete").disabled = true;
+                var flag = 'delete';
+                var emp_code = $('#emp_code').val();
+                var input = emp_code;
+                $.ajax({
+                    type: "POST",
+                    contentType: "application/json; charset=utf-8",
+                    url: "Crud_Operation_Interview.aspx/submit",
+                    data: "{QueryString:'" + flag + "',Input : '" + input + "'}",
+                    dataType: "json",
+                    success: function (Result) {
+                        alert(Result.d);
+                        window.open('Crud_Operation_Interview.aspx', '_self');
+                    },
+                    error: function (Result) {
+                        alert(Result.d);
+                        document.getElementById("delete").disabled = false;
+                    }
+                });
+            }
+        }
+
+    </script>
+</asp:Content>
+<asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
+      <style>
+       .thead
+       {
+            top:0;
+            position:sticky;
+            background-color:#5e6a66;
+            color:white;
+            font-size:1.2rem;
+            text-align:center;
+        }
+       
+        .pointer {cursor: pointer;}
+        </style>
+    <div class="crumbs">
+        <ul id="breadcrumbs" class="breadcrumb">
+            <li><i class="icon-home"></i><a href="../Index/index.aspx">Dashboard</a></li>
+            <li class="current"><a href="../Asirvad_Internal/Crud_Operation_Interview.aspx" title="">Crud Operation Interview</a></li>
+        </ul>
+    </div>
+    <div class="form-group align-center" style="padding-bottom:30px;" id="Head_div">
+                        <div class="ma-header">
+                            <h3><i class="icon-tasks"></i> CRUD OPERATIONS FORM</h3>
+                        </div>
+                    </div>
+    <div class="form-group align-center" style="padding-bottom:30px;" id="Head_div1">
+                        <div class="ma-header">
+                            <h3><i class="icon-tasks"></i> ALL EMPLOYEE DETAILS</h3>
+                        </div>
+                    </div>
+    <div class="form-group align-center" style="padding-bottom:30px;" id="Head_div2">
+                        <div class="ma-header">
+                            <h3><i class="icon-tasks"></i> EMPLOYEE DETAILS INSERTION</h3>
+                        </div>
+                    </div>
+    <div class="form-group align-center" style="padding-bottom:30px;" id="Head_div3">
+                        <div class="ma-header">
+                            <h3><i class="icon-tasks"></i> EMPLOYEE DETAILS UPDATION</h3>
+                        </div>
+                    </div>
+    <div class="form-group align-center" style="padding-bottom:30px;" id="Head_div4">
+                        <div class="ma-header">
+                            <h3><i class="icon-tasks"></i> EMPLOYEE DETAILS REMOVE</h3>
+                        </div>
+                    </div>
+    <div class="row" id="row_div">
+        <div class="col-md-3" style="padding-left:205px;">
+             <label for="fundcat"style="font:menu;font-weight: bold;">SELECT OPTION</label>
+            </div>
+            <div class="col-md-1" style="padding-left:30px;">
+                <label for="fundcat"font-weight: bold;">:</label>       
+            </div>
+        <div class="col-md-8">
+                <select  class="custom-select form-control" id="option" onchange="FetchData();" style="width:50%; text-align:center;" >
+               <option value="0">SELECT</option>
+              <option value="1">ALL EMPLOYEE DETAILS</option>
+              <option value="2">EMPLOYEE DETAILS INSERTION</option>
+              <option value="3">EMPLOYEE DETAILS UPDATION</option>
+              <option value="4">EMPLOYEE DETAILS REMOVE</option>
+                  </select>
+        </div>
+    </div> 
+    <div class="row" id="row_div1">
+        <div class="form-group col-md-12">
+            <div class="col-md-1"></div>
+                             <label class="col-md-2 cntr-text" style="font-weight: bolder;">Employee Name<b style="color:red">&nbsp;&nbsp;&nbsp;*</b>:</label>
+                              <div class="col-md-3">
+                                <input type="text" class="form-control" id="name" maxlength="50"  name="emp_name" required="required" onblur="leftTrim(this)" autocomplete="off"   onkeyup="this.value=this.value.toUpperCase()" onkeypress="return /[A-Za-z\s]/i.test(event.key)" onpaste="return false;" oncopy="return false;"  />
+                                 </div>                                                         
+                            
+                           
+                                     <label class="col-md-2 cntr-text" style="padding-left:50px;font-weight: bolder;">Address<b style="color:red">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*</b>:</label>
+                            <div class="col-md-3">
+                                  <input type="text" name="address" class="form-control" maxlength="100"  id="address"    required="required" onblur="leftTrim(this)" autocomplete="off" onkeyup="this.value=this.value.toUpperCase()"/>
+                    </div>
+                              <div class="col-md-1"></div> 
+                                  </div>
+        <div class="form-group col-md-12">
+            <div class="col-md-1"></div>
+                             <label class="col-md-2 cntr-text" style="font-weight: bolder;">Place<b style="color:red">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*</b>:</label>
+                              <div class="col-md-3">
+                                <input type="text" class="form-control" id="place" maxlength="50"  name="place" required="required" onblur="leftTrim(this)" autocomplete="off"   onkeyup="this.value=this.value.toUpperCase()" onkeypress="return /[A-Za-z\s]/i.test(event.key)" onpaste="return false;" oncopy="return false;"  />
+                                 </div>                                                         
+                            
+                           
+                                     <label class="col-md-2 cntr-text" style="padding-left:50px;font-weight: bolder;">Gender<b style="color:red">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*</b>:</label>
+                            <div class="col-md-3">
+                                  <select  class="custom-select form-control" id="gender" style="width:90%; text-align:left;" >
+               <option value="0">SELECT</option>
+              <option value="1">MALE</option>
+              <option value="2">FEMALE</option>
+              <option value="3">OTHERS</option>
+                  </select>
+                    </div>
+                              <div class="col-md-1"></div> 
+                                  </div>
+        <div class="form-group col-md-12">
+            <div class="col-md-1"></div>
+                             <label class="col-md-2 cntr-text" style="font-weight: bolder;">Date Of Birth<b style="color:red">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*</b>:</label>
+                              <div class="col-md-3">
+                                <input type="text" class="form-control" id="dob" maxlength="30"  name="dob" required="required" onblur="leftTrim(this)" autocomplete="off"   onkeyup="this.value=this.value.toUpperCase()" onkeypress="return false;"onpaste="return false;" oncopy="return false;"  />
+                                 </div>                                                         
+                            
+                           
+                                     <label class="col-md-2 cntr-text" style="padding-left:50px;font-weight: bolder;">Contact Number<b style="color:red">&nbsp;&nbsp;&nbsp;*</b>:</label>
+                            <div class="col-md-3">
+                                  <input type="text" name="phone" class="form-control" maxlength="10"  id="phone"    required="required" onblur="leftTrim(this)" autocomplete="off" onkeyup="this.value=this.value.toUpperCase()" onchange="check_number();" onpaste="return false;" oncopy="return false;" onkeypress ="validate(event)" />
+                    </div>
+                              <div class="col-md-1"></div> 
+                                  </div>
+        <div class="form-group col-md-12">
+            <div class="col-md-1"></div>
+                             <label class="col-md-2 cntr-text" style="font-weight: bolder;">Qualification<b style="color:red">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*</b>:</label>
+                              <div class="col-md-3">
+                                <select  class="custom-select form-control" id="education" style="width:90%; text-align:left;" >
+               <option value="0">SELECT</option>
+              <option value="1">SSLC</option>
+              <option value="2">PLUS TWO</option>
+              <option value="3">GRADUATION</option>
+              <option value="4">POST GRADUATION</option>
+                  </select>
+                                 </div>                                                         
+                            
+                           
+                                     <label class="col-md-2 cntr-text" style="padding-left:50px;font-weight: bolder;">Department<b style="color:red">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*</b>:</label>
+                            <div class="col-md-3">
+                                  <select  class="custom-select form-control" id="designation" style="width:90%; text-align:left;" >
+               <option value="0">SELECT</option>
+              <option value="1">HRM</option>
+              <option value="2">FINANCE</option>
+              <option value="3">MARKETING</option>
+              <option value="4">SALES</option>
+              <option value="5">IT INFRA</option>
+              <option value="6">IT APPLICATION</option>
+              <option value="7">STAFF</option>
+                  </select>
+                    </div>
+                              <div class="col-md-1"></div> 
+                                  </div>
+    </div>
+    <div class="row" id="row_div2">
+        <div class="form-group col-md-12">
+            <div class="col-md-1"></div>
+                             <label class="col-md-2 cntr-text" style="font-weight: bolder;">Employee Code&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:</label>
+                              <div class="col-md-3">
+                                <select class="form-control" id="emp_code" name="empcode" style="width:90%;">
+                                 <option value="0" selected="selected">Select</option>
+                                </select>
+                                 </div>                                                         
+                            
+                           
+                                     <label class="col-md-2 cntr-text" style="padding-left:35px;font-weight: bolder;">Updated Date&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:</label>
+                            <div class="col-md-3">
+                                  <input type="text" name="updateddate" class="form-control" maxlength="100"  id="date"    required="required" onblur="leftTrim(this)" autocomplete="off" onkeyup="this.value=this.value.toUpperCase()" disabled="disabled"/>
+                    </div>
+                              <div class="col-md-1"></div> 
+                                  </div>
+        <div class="form-group col-md-12">
+            <div class="col-md-1"></div>
+                             <label class="col-md-2 cntr-text" style="font-weight: bolder;">Employee Name&nbsp;&nbsp;&nbsp;:</label>
+                              <div class="col-md-3">
+                                <input type="text" class="form-control" id="name_edit" maxlength="50"  name="emp_name" required="required" onblur="leftTrim(this)" autocomplete="off"   onkeyup="this.value=this.value.toUpperCase()" onkeypress="return /[A-Za-z\s]/i.test(event.key)" onpaste="return false;" oncopy="return false;"  disabled="disabled"/>
+                                 </div>                                                         
+                            
+                           
+                                     <label class="col-md-2 cntr-text" style="padding-left:35px;font-weight: bolder;">Address&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:</label>
+                            <div class="col-md-3">
+                                  <input type="text" name="address" class="form-control" maxlength="100"  id="address_edit"    required="required" onblur="leftTrim(this)" autocomplete="off" onkeyup="this.value=this.value.toUpperCase()"disabled="disabled"/>
+                    </div>
+                              <div class="col-md-1"></div> 
+                                  </div>
+        <div class="form-group col-md-12">
+            <div class="col-md-1"></div>
+                             <label class="col-md-2 cntr-text" style="font-weight: bolder;">Place&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:</label>
+                              <div class="col-md-3">
+                                <input type="text" class="form-control" id="place_edit" maxlength="50"  name="place" required="required" onblur="leftTrim(this)" autocomplete="off"   onkeyup="this.value=this.value.toUpperCase()" onkeypress="return /[A-Za-z\s]/i.test(event.key)" onpaste="return false;" oncopy="return false;"  disabled="disabled"/>
+                                 </div>                                                         
+                            
+                           
+                                     <label class="col-md-2 cntr-text" style="padding-left:35px;font-weight: bolder;">Gender&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:</label>
+                            <div class="col-md-3">
+                                  <select  class="custom-select form-control" id="gender_edit" style="width:90%; text-align:left;" disabled="disabled">
+              <option value="0">SELECT</option>
+              <option value="1">MALE</option>
+              <option value="2">FEMALE</option>
+              <option value="3">OTHERS</option>
+                  </select>
+                    </div>
+                              <div class="col-md-1"></div> 
+                                  </div>
+        <div class="form-group col-md-12">
+            <div class="col-md-1"></div>
+                             <label class="col-md-2 cntr-text" style="font-weight: bolder;">Date Of Birth&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:</label>
+                              <div class="col-md-3">
+                                <input type="text" class="form-control" id="dob_edit" maxlength="30"  name="dob" required="required" onblur="leftTrim(this)" autocomplete="off"   onkeyup="this.value=this.value.toUpperCase()" onkeypress="return false;"onpaste="return false;" oncopy="return false;"  disabled="disabled"/>
+                                 </div>                                                         
+                            
+                           
+                                     <label class="col-md-2 cntr-text" style="padding-left:35px;font-weight: bolder;">Contact Number&nbsp;&nbsp;&nbsp;:</label>
+                            <div class="col-md-3">
+                                  <input type="text" name="phone" class="form-control" maxlength="10"  id="phone_edit"    required="required" onblur="leftTrim(this)" autocomplete="off" onkeyup="this.value=this.value.toUpperCase()" onchange="check_num();" onpaste="return false;" oncopy="return false;" onkeypress ="validate(event)" disabled="disabled"/>
+                    </div>
+                              <div class="col-md-1"></div> 
+                                  </div>
+        <div class="form-group col-md-12">
+            <div class="col-md-1"></div>
+                             <label class="col-md-2 cntr-text" style="font-weight: bolder;">Qualification&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:</label>
+                              <div class="col-md-3">
+                                <select  class="custom-select form-control" id="education_edit" style="width:90%; text-align:left;" disabled="disabled">
+              <option value="0">SELECT</option>
+              <option value="1">SSLC</option>
+              <option value="2">PLUS TWO</option>
+              <option value="3">GRADUATION</option>
+              <option value="4">POST GRADUATION</option>
+                  </select>
+                                 </div>                                                         
+                            
+                           
+                                     <label class="col-md-2 cntr-text" style="padding-left:35px;font-weight: bolder;">Designation&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:</label>
+                            <div class="col-md-3">
+                                  <select  class="custom-select form-control" id="designation_edit" style="width:90%; text-align:left;" disabled="disabled">
+               <option value="0">SELECT</option>
+              <option value="1">HRM</option>
+              <option value="2">FINANCE</option>
+              <option value="3">MARKETING</option>
+              <option value="4">SALES</option>
+              <option value="5">IT INFRA</option>
+              <option value="6">IT APPLICATION</option>
+              <option value="7">STAFF</option>
+                  </select>
+                    </div>
+                              <div class="col-md-1"></div> 
+                                  </div>
+    </div>
+    <div class="row" id="button_div" style="padding-top:30px; " >
+        <div class="col-md-6"style="PADDING-LEFT: 430PX; ">                 
+                 <input id="submit" type="button" value="SUBMIT" class="btn btn-prop btn-input mv-btn btn-style" style="   width: 170px;        HEIGHT: 35PX; BORDER-COLOR: black;" onclick="Submit()" data-toggle="modal" data-backdrop="false" />
+         </div>
+     <div class="col-md-6" >
+                  <input id="back" type="button" value="BACK" class="btn btn-prop btn-input mv-btn btn-style" style="   width: 170px;        HEIGHT: 35PX; BORDER-COLOR: black;" onclick="Back();" data-toggle="modal" data-backdrop="false" />
+         </div>
+    </div>
+    <div class="row" id="button_div_1" style="padding-top:30px; " >
+        <div class="col-md-6"style="PADDING-LEFT: 430PX; ">                 
+                 <input id="update" type="button" value="UPDATE" class="btn btn-prop btn-input mv-btn btn-style" style="   width: 170px;        HEIGHT: 35PX; BORDER-COLOR: black;" onclick="Update()" data-toggle="modal" data-backdrop="false" />
+         </div>
+     <div class="col-md-6" >
+                  <input id="back1" type="button" value="BACK" class="btn btn-prop btn-input mv-btn btn-style" style="   width: 170px;        HEIGHT: 35PX; BORDER-COLOR: black;" onclick="Back();" data-toggle="modal" data-backdrop="false" />
+         </div>
+           
+    </div>
+    <div class="row" id="button_div_2" style="padding-top:30px; " >
+        <div class="col-md-6"style="PADDING-LEFT: 430PX; ">                 
+                 <input id="delete" type="button" value="DELETE" class="btn btn-prop btn-input mv-btn btn-style" style="   width: 170px;        HEIGHT: 35PX; BORDER-COLOR: black;" onclick="Delete()" data-toggle="modal" data-backdrop="false" />
+         </div>
+     <div class="col-md-6" >
+                  <input id="back2" type="button" value="BACK" class="btn btn-prop btn-input mv-btn btn-style" style="   width: 170px;        HEIGHT: 35PX; BORDER-COLOR: black;" onclick="Back();" data-toggle="modal" data-backdrop="false" />
+         </div>
+           
+    </div>
+    <div class="row" id="tbl_div">
+        <div class="col-md-12" style="padding-bottom:15px;">
+            <input id="back3" type="button" value="BACK" class="btn btn-prop btn-input mv-btn btn-style" style="   width: 170px;        HEIGHT: 35PX; BORDER-COLOR: black;" onclick="Back();" data-toggle="modal" data-backdrop="false" />
+        </div>
+    <div  class=" scrollit"   style="padding-left: 15px; font: message-box;">
+         <table border="1"; class="table"  id="tblticket" style="font-size: 11px;    width:100%; display: table-header-group; text-align:center;"  > 
+          <thead class="thead" style="font-size:13px;" onclick="disabled"> </thead> 
+            <tbody style="cursor:pointer;"></tbody>
+         </table>
+        </div>
+        </div>
+    
+    <input id="hdUserId1" type="hidden" runat="server" />
+    <input id="hdPag" type="hidden" runat="server" />
+    <input id="hdSerLoan" type="hidden" runat="server" />
+    <input id="hdSerbank" type="hidden" runat="server" />
+    <input id="hdBrid" type="hidden" runat="server" />
+    <input id="hdFirmId" type="hidden" runat="server" />
+</asp:Content>

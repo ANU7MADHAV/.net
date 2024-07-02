@@ -1,0 +1,117 @@
+create or replace procedure PROC_CRUD_OPERATION_INTERVIEW(p_flag    in varchar2,
+                                                          p_pageval in varchar2,
+                                                          p_parval1 in varchar2,
+                                                          p_parval2 in varchar2,
+                                                          p_parval3 in varchar2,
+                                                          p_OutMsg  OUT RESULT_TYPE.QRY_RESULT) is
+
+  INPUTS  ARRAY := SPLITSTR(p_parval1, '¥');
+  empcode number;
+
+  v_ErrDesc tbl_itsm_error_dtl.error_description%type;
+  v_ErrDtl  tbl_itsm_error_dtl.error_details%type;
+  v_ErrID   tbl_itsm_error_dtl.error_id%type;
+begin
+
+  if p_flag = 'CRUD' then
+  
+    if p_pageVal = 'insert' then
+      empcode := seq_emp_code_interview.nextval;
+      insert into interview_employee_details
+        (emp_code,
+         emp_name,
+         address,
+         place,
+         gender,
+         dob,
+         phone,
+         education,
+         designation,
+         status,
+         entered_date)
+      values
+        (empcode,
+         INPUTS(1),
+         INPUTS(2),
+         INPUTS(3),
+         INPUTS(4),
+         TO_DATE(INPUTS(5),'DD-MM-YY'),
+         INPUTS(6),
+         INPUTS(7),
+         INPUTS(8),
+         1,
+         SYSDATE);
+      open p_OutMsg for
+        select 'Employee Details Inserted Successfully,Employee Code is' ||
+               empcode
+          from dual;
+    elsif p_pageVal = 'drop_empcodes' then
+      open p_OutMsg for
+        select t.emp_code from interview_employee_details t;
+    elsif p_pageVal = 'all_emp_details' then
+      open p_OutMsg for
+        select t.emp_code,
+               t.emp_name,
+               t.address,
+               t.place,
+               t.gender,
+               to_char(to_date(t.dob,'dd-mm-yy')),
+               t.phone,
+               t.education,
+               t.designation,
+               to_char(to_date(t.entered_date, 'dd-mm-yy'))
+          from interview_employee_details t;
+    elsif p_pageVal = 'select' then
+      open p_OutMsg for
+        select to_char(to_date(sysdate, 'dd-mm-yy')),
+               t.emp_name,
+               t.address,
+               t.place,
+               decode(t.gender,'MALE',1,'FEMALE',2,'OTHERS',3),
+               to_char(to_date(t.dob,'dd-mm-yy')),
+               t.phone,
+               decode(t.education,'SSLC',1,'PLUS TWO',2,'GRADUATION',3,'POST GRADUATION',4),
+               decode(t.designation,'HRM',1,'FINANCE',2,'MARKETING',3,'SALES',4,'IT INFRA',5,'IT APPLICATION',6,'STAFF',7)
+          from interview_employee_details t where t.emp_code = INPUTS(1);
+    elsif p_pageVal = 'update' then
+      update interview_employee_details t
+         set t.emp_name     = INPUTS(1),
+             t.address      = INPUTS(2),
+             t.place        = INPUTS(3),
+             t.gender       = INPUTS(4),
+             t.dob          = to_date(INPUTS(5),'dd-mm-yy'),
+             t.phone        = INPUTS(6),
+             t.education    = INPUTS(7),
+             t.designation  = INPUTS(8),
+             t.updated_date = sysdate
+       where t.emp_code = INPUTS(9);
+      open p_OutMsg for
+        select 'Employee Details Updated successfully' from dual;
+    elsif p_pageVal = 'delete' then
+      delete from interview_employee_details t
+       where t.emp_code = INPUTS(1);
+      open p_OutMsg for
+        select 'Employee Details Deleted Successfully' from dual;
+    end if;
+  end if;
+  ------------------------------------------------------------------------------------------------------------
+exception
+  when others then
+    -- rollback to transstart;
+    v_ErrID := seq_itsm_error_id.nextval;
+    --p_OutMsg:='Oops..!Something Went Wrong...!'||v_ErrID;
+    v_ErrDesc := Sqlerrm;
+    v_ErrDtl  := Sqlerrm || dbms_utility.format_error_backtrace ||
+                 dbms_utility.format_error_stack ||
+                 dbms_utility.format_call_stack;
+    insert into tbl_itsm_error_dtl
+      (error_id, proc_name, error_description, error_details, tra_dt)
+    values
+      (v_ErrID,
+       'PROC_CRUD_OPERATION_INTERVIEW',
+       v_ErrDesc,
+       v_ErrDtl,
+       sysdate);
+    commit;
+  
+end;
